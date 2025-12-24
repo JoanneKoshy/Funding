@@ -1,4 +1,6 @@
 import streamlit as st
+from backend.rag import answer_with_rag
+
 from backend.llm import ask_gemini
 from backend.language import (
     translate_to_english,
@@ -99,7 +101,7 @@ if submit:
     """
 
     # 3️⃣ Gemini generates response in English
-    english_answer = ask_gemini(prompt)
+    english_answer = answer_with_rag(normalized_question)
 
     # 4️⃣ Translate back to selected language
     final_answer = translate_from_english(english_answer, language)
