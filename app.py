@@ -1,5 +1,9 @@
 import streamlit as st
 from backend.rag import retrieve_context_by_state
+from backend.eligible import check_eligibility
+@st.cache_data(show_spinner=False)
+def cached_gemini_response(prompt):
+    return ask_gemini(prompt)
 
 from backend.rag import answer_with_rag
 
@@ -96,17 +100,24 @@ if submit:
         context = retrieve_context_by_state(normalized_question, state)
 
         prompt = f"""
-        You are an AI assistant for regional startup funding intelligence.
-        Use ONLY the context below to answer.
+You are an AI assistant for regional startup funding intelligence.
 
-        CONTEXT:
-        {context}
+Use the provided context as the primary source.
+If the context does not fully answer the question, you may:
+- Use your general knowledge about Indian startup funding
+- Clearly state that the response is based on general insights
+- Provide best-possible guidance instead of refusing
+- do not keep it too long, make it optimzed and good soo that a founder can read it quickly and in a positive way as if, it is available and really good and no need of validition at start, just start with points
 
-        QUESTION:
-        {normalized_question}
+CONTEXT:
+{context}
 
-        If the answer is not in the context, say you do not have enough information.
-        """
+QUESTION:
+{normalized_question}
+
+Respond clearly, practically, and founder-friendly.
+"""
+
 
         english_answer = ask_gemini(prompt)
 
@@ -115,6 +126,18 @@ if submit:
 
     # 3️⃣ Translate back to selected language
     final_answer = translate_from_english(english_answer, language)
+
+
+
+    if feature == "Eligibility Check":
+        english_answer = check_eligibility(
+        question=normalized_question,
+        startup_age=startup_age,
+        sector=sector,
+        revenue_stage=revenue_stage,
+        state=state,
+        language=language
+    )
 
     # 4️⃣ Display answer
     st.write(final_answer)
