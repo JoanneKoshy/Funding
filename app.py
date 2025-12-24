@@ -1,5 +1,10 @@
 import streamlit as st
 from backend.llm import ask_gemini
+from backend.language import (
+    translate_to_english,
+    translate_from_english
+)
+
 
 
 # ---------------- PAGE CONFIG ----------------
@@ -74,32 +79,40 @@ submit = st.button("Submit")
 
 # ---------------- DEBUG OUTPUT (TEMPORARY) ----------------
 # ---------------- SUBMIT HANDLER ----------------
+# ---------------- SUBMIT HANDLER ----------------
 if submit:
     st.markdown("### 🤖 AI Response")
 
-    # Base prompt (temporary – will become smarter later)
-    prompt = f"""
-    You are an AI assistant for startup funding and investor intelligence.
-    Reply clearly and concisely.
+    # 1️⃣ Translate user input → English
+    normalized_question = translate_to_english(question, language)
 
-    Language: {language}
+    # 2️⃣ Core English-only reasoning prompt
+    prompt = f"""
+    You are an AI assistant for startup funding, investor insights, and policy intelligence.
+
     Feature: {feature}
 
     User Question:
-    {question}
+    {normalized_question}
+
+    Respond clearly, practically, and concisely.
     """
 
-    # Call Gemini
-    answer = ask_gemini(prompt)
+    # 3️⃣ Gemini generates response in English
+    english_answer = ask_gemini(prompt)
 
-    # Display answer
-    st.write(answer)
+    # 4️⃣ Translate back to selected language
+    final_answer = translate_from_english(english_answer, language)
 
-    # ---- Debug Info (optional, remove later) ----
+    # 5️⃣ Display final answer
+    st.write(final_answer)
+
+    # ---- Debug Info (optional) ----
     with st.expander("🔧 Debug Info"):
         st.write("Selected Feature:", feature)
         st.write("Selected Language:", language)
-        st.write("Question:", question)
+        st.write("Original Question:", question)
+        st.write("Normalized (English):", normalized_question)
 
         if feature == "Eligibility Check":
             st.write({
