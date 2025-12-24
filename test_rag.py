@@ -1,6 +1,7 @@
-from backend.rag import answer_with_rag
+from backend.rag import retrieve_context_by_state
 
-question = "What funding support is available for early-stage startups?"
-answer = answer_with_rag(question)
+query = "What funding support is available for startups?"
+state = "Kerala"
 
-print(answer)
+context = retrieve_context_by_state(query, state)
+print(context)

@@ -1,4 +1,6 @@
 import streamlit as st
+from backend.rag import retrieve_context_by_state
+
 from backend.rag import answer_with_rag
 
 from backend.llm import ask_gemini
@@ -82,37 +84,45 @@ submit = st.button("Submit")
 # ---------------- DEBUG OUTPUT (TEMPORARY) ----------------
 # ---------------- SUBMIT HANDLER ----------------
 # ---------------- SUBMIT HANDLER ----------------
+# ---------------- SUBMIT HANDLER ----------------
 if submit:
     st.markdown("### 🤖 AI Response")
 
     # 1️⃣ Translate user input → English
     normalized_question = translate_to_english(question, language)
 
-    # 2️⃣ Core English-only reasoning prompt
-    prompt = f"""
-    You are an AI assistant for startup funding, investor insights, and policy intelligence.
+    
+    if feature == "Regional Funding":
+        context = retrieve_context_by_state(normalized_question, state)
 
-    Feature: {feature}
+        prompt = f"""
+        You are an AI assistant for regional startup funding intelligence.
+        Use ONLY the context below to answer.
 
-    User Question:
-    {normalized_question}
+        CONTEXT:
+        {context}
 
-    Respond clearly, practically, and concisely.
-    """
+        QUESTION:
+        {normalized_question}
 
-    # 3️⃣ Gemini generates response in English
-    english_answer = answer_with_rag(normalized_question)
+        If the answer is not in the context, say you do not have enough information.
+        """
 
-    # 4️⃣ Translate back to selected language
+        english_answer = ask_gemini(prompt)
+
+    else:
+        english_answer = answer_with_rag(normalized_question)
+
+    # 3️⃣ Translate back to selected language
     final_answer = translate_from_english(english_answer, language)
 
-    # 5️⃣ Display final answer
+    # 4️⃣ Display answer
     st.write(final_answer)
 
     # ---- Debug Info (optional) ----
     with st.expander("🔧 Debug Info"):
-        st.write("Selected Feature:", feature)
-        st.write("Selected Language:", language)
+        st.write("Feature:", feature)
+        st.write("Language:", language)
         st.write("Original Question:", question)
         st.write("Normalized (English):", normalized_question)
 
