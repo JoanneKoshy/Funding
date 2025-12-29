@@ -1,6 +1,6 @@
-# Funding
+# Funding Expert
 
-**Funding** is a **Multilingual AI-powered Funding Intelligence System** that helps startup founders discover funding opportunities, understand eligibility, analyze investor expectations, simplify policy documents, and track funding trends — all through a conversational interface in **English, Malayalam, and Hindi**.
+**Funding Expert** is a **Multilingual AI-powered Funding Intelligence System** that helps startup founders discover funding opportunities, understand eligibility, analyze investor expectations, simplify policy documents, and track funding trends — all through a conversational interface in **English, Malayalam, and Hindi**.
 
 ---
 
